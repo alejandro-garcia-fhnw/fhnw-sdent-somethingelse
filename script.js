@@ -30,6 +30,9 @@ video.addEventListener('play', () => {
     //faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
     //faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
   
+
+    // nonig grad d best Weg zum d Emotione uslese...
+    
     if(resizedDetections[0].expressions.angry > 0.7) {
       console.log("😡")
       document.getElementById("expressions").innerHTML = "😡";
