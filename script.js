@@ -29,31 +29,38 @@ video.addEventListener('play', () => {
     //faceapi.draw.drawDetections(canvas, resizedDetections)
     //faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
     //faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
-  
 
-    // nonig grad d best Weg zum d Emotione uslese...
-    
-    if(resizedDetections[0].expressions.angry > 0.7) {
-      console.log("😡")
-      document.getElementById("expressions").innerHTML = "😡";
-    }
-    if (resizedDetections[0].expressions.sad > 0.7) {
-      console.log("😢")
-      document.getElementById("expressions").innerHTML = "😢";
-    }
-    if (resizedDetections[0].expressions.surprised > 0.7) {
-      console.log("😲")
-      document.getElementById("expressions").innerHTML = "😲";
-    }
-    if (resizedDetections[0].expressions.neutral > 0.7) {
-      console.log("😶")
-      document.getElementById("expressions").innerHTML = "😶";
-    }
-    if(resizedDetections[0].expressions.happy > 0.7) {
-      console.log("😃")
-      document.getElementById("expressions").innerHTML = "😃";
+    if (resizedDetections && resizedDetections.length > 0 && resizedDetections[0].expressions) {
+      handleExpressions(resizedDetections[0].expressions);
     }
   }, 100)
 })
 
-angry
+let expressionCount = {};
+const emotes = Object.freeze({
+  "angry" : "😡",
+  "sad" : "😢",
+  "surprised" : "😲",
+  "happy" : "😃",
+  "neutral" : "😶"
+});
+
+function handleExpressions(expressions) {
+    // es bitz ä bessere Weg zum d Emotione uslese...
+    let emote = emotes["neutral"];
+    for (const [key, value] of Object.entries(expressions)) {
+      if (value > 0.7) {
+        let count = (expressionCount[key] || 0);
+        if (count === 0) {
+          expressionCount = {};
+        }
+        expressionCount[key] = count + 1;
+        if (expressionCount[key] > 10) {
+          emote = emotes[key];
+          // locked in
+        }
+      }
+    }
+    document.getElementById("expressions").innerHTML = emote;
+    console.log(expressionCount);
+}
