@@ -7,30 +7,17 @@
   <title>Document</title>
   <script defer src="face-api.min.js"></script>
   <script defer src="script.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    canvas {
-      position: absolute;
-    }
- 
-    
-
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <video id="video" width="480" height="320" autoplay muted></video>
-    
-    <h1 style=font-size:200px id="expressions"></h1>
-  
+    <div class="input" >
+      <video id="video" width="480" height="320" autoplay muted></video>
+      <h1 id="expression">😶</h1>
+      <progress id="progress" value="0" min="0" max="100" />
+    </div>
+    <div class="quiz">
+      <button id="start">Start</button>
+      <div id="question" class="hidden">How was the year 2020?</div>
+    </div>
 </body>
 </html>
