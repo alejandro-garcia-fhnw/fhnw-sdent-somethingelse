@@ -65,12 +65,10 @@ function handleExpressions(expressions) {
       document.getElementById('progress').value = !isNeutral ? (count * 10) : 0;
       if (!isNeutral && expressionCount[name] > 10) {
         // locked in
-        if (started) {
-          if (name === questions[questionIdx][1]) {
-            expressionElem.classList.add('green');
-          } else {
-            expressionElem.classList.add('red');
-          }
+        if (!started || (name === questions[questionIdx][1])) {
+          expressionElem.classList.add('green');
+        } else {
+          expressionElem.classList.add('red');
         }
       }
       break;
