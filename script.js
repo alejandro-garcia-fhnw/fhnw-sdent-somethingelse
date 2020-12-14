@@ -55,12 +55,12 @@ function handleExpressions(expressions) {
   for (const [name, score] of Object.entries(expressions)) {
     const isNeutral = (name === 'neutral');
     if (score > 0.7) {
-      let count = (expressionCount[name] || 0);
+      const count = (expressionCount[name] || 0);
       if (count === 0) {
         expressionCount = {};
         expressionElem.classList = '';
       }
-      emote = emotes[name];
+      emote = emotes[name] || emote;
       expressionCount[name] = count + 1;
       document.getElementById('progress').value = !isNeutral ? (count * 10) : 0;
       if (!isNeutral && expressionCount[name] > 10) {
