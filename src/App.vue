@@ -23,13 +23,20 @@ export default {
   color: #2c3e50;
   background-color: #f5f5f5;
 }
-
 ul {
   list-style-type: none;
   padding: 0;
 }
-
 h2 {
   text-align: center;
+}
+.hidden {
+  display: none;
+}
+.green {
+  background-color: lightgreen;
+}
+.red {
+  background-color: orangered;
 }
 </style>
