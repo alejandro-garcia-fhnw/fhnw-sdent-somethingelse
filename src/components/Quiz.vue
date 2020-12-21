@@ -45,19 +45,9 @@ export default {
     questions : [],
     smiles : ["😢","😲","😡","😃"],
     randomSmile: null,
-    emotes : Object.freeze({
-      'angry' : '😡',
-      'sad' : '😢',
-      'surprised' : '😲',
-      'happy' : '😃',
-      'neutral' : '😶',
-      'default' : '😶'
-    }),
 
-    actualQuestion: {
-      question: "test Question?",
-      allAnswers: ["sad","happy","surprised","angry"]
-    }
+
+    actualQuestion: null
   }),
   methods: {
 
@@ -75,7 +65,6 @@ export default {
     * wählt zufälles Fragen-Objekt aus
     * packt die falschen und die richtigen antworten in ein Array von allAnswers und mischelt den Array
     */
-
     getNewQuestion() {
       let randomSmile = this.smiles[Math.floor(Math.random() * this.smiles.length)]
       let otherSmiles = this.smiles.filter(function(item) {
@@ -95,7 +84,7 @@ export default {
         randomQuestion.allAnswers = allAnswers
 
         this.actualQuestion = randomQuestion;
-        console.log(this.actualQuestion.correct_answer)
+        console.log("correct answer: " + this.actualQuestion.correct_answer)
       }
 
     },
