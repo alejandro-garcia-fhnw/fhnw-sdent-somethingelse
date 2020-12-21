@@ -1,6 +1,10 @@
 <template>
   <div id="game" ref="game">
-    <video ref="video" width="480" height="320" autoplay muted />
+<div class="wrapper">
+  <video ref="video" width="480" height="320" autoplay muted/>
+</div>
+
+
     <Detect ref="detect" @detected="onDetect"/>
     <Quiz ref="quiz" />
   </div>
@@ -54,5 +58,19 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.wrapper {
+  padding: 100px;
+}
+video {
+  width: 250px;
+  height: 250px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 50%;
+  margin: 20px;
+  object-fit: cover;
+  object-position: center right;
 }
 </style>
