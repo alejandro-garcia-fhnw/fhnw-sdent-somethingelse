@@ -34,7 +34,7 @@ export default {
       const quiz = this.$refs.quiz;
       if (!expression) {
         this.$refs.game.classList = '';
-      } else if (!quiz.isStarted() || quiz.answer(expression)) {
+      } else if /*(!quiz.isStarted() ||*/ (quiz.answer(expression)) {
         this.$refs.game.classList.add('green');
       } else {
         this.$refs.game.classList.add('red');

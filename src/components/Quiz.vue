@@ -8,11 +8,11 @@
 
     <v-row>
       <v-col align="center">
-        <v-card width="100%" height="200" v-if="actualQuestion">
+        <v-card width="800px" height="200" v-if="actualQuestion">
           <v-card-title>{{actualQuestion.question}}</v-card-title>
           <v-card-actions style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 0;">
             <v-spacer></v-spacer>
-            <v-btn color="primary" large v-for="a in actualQuestion.allAnswers" :key="a"><span style="font-size: 2.5rem" class="mr-3"></span> {{ a }}</v-btn>
+            <v-btn style="font-size: 1.5rem" x-large color="primary"  v-for="a in actualQuestion.allAnswers" :key="a"> {{ a }}</v-btn>
 <!--            <v-btn color="primary" large> <span style="font-size: 2.5rem" class="mr-3">{{ emotes[Math.floor(Math.random() * emotes.length)] }}</span> {{ actualQuestion.correct_answer}}</v-btn>-->
             <v-spacer></v-spacer>
           </v-card-actions>
@@ -30,7 +30,7 @@
 
 <script>
 import axios from 'axios'
-const url = 'https://opentdb.com/api.php?amount=20&category=9&difficulty=easy&type=multiple';
+const url = 'https://opentdb.com/api.php?amount=30&category=9&difficulty=easy&type=multiple';
 
 export default {
   name: "Quiz",
@@ -43,8 +43,21 @@ export default {
       ])
     },
     questions : [],
-    emotes : ["😢","😲","😡"],
-    actualQuestion: {}
+    smiles : ["😢","😲","😡","😃"],
+    randomSmile: null,
+    emotes : Object.freeze({
+      'angry' : '😡',
+      'sad' : '😢',
+      'surprised' : '😲',
+      'happy' : '😃',
+      'neutral' : '😶',
+      'default' : '😶'
+    }),
+
+    actualQuestion: {
+      question: "test Question?",
+      allAnswers: ["sad","happy","surprised","angry"]
+    }
   }),
   methods: {
 
@@ -62,13 +75,25 @@ export default {
     * wählt zufälles Fragen-Objekt aus
     * packt die falschen und die richtigen antworten in ein Array von allAnswers und mischelt den Array
     */
+
     getNewQuestion() {
+      let randomSmile = this.smiles[Math.floor(Math.random() * this.smiles.length)]
+      let otherSmiles = this.smiles.filter(function(item) {
+        return item !== randomSmile
+      })
+
       let randomQuestion = this.questions[Math.floor(Math.random() * this.questions.length)]
       if (!randomQuestion.allAnswers) { //prüft ob das Object schon ein allAnswers Array hat
         let allAnswers = randomQuestion.incorrect_answers
+        for (let i = 0; i < allAnswers.length; i++) {
+          allAnswers[i] = otherSmiles[i] + allAnswers[i]
+        }
+        randomQuestion.correct_answer = randomSmile + randomQuestion.correct_answer
         allAnswers.push(randomQuestion.correct_answer)
         this.shuffle(allAnswers)
+
         randomQuestion.allAnswers = allAnswers
+
         this.actualQuestion = randomQuestion;
         console.log(this.actualQuestion.correct_answer)
       }
@@ -86,7 +111,20 @@ export default {
       return this.quiz.pos >= 0;
     },
     answer(response) {
-      return response === this.quiz.questions[this.quiz.pos][1];
+      if (response === "happy") {
+        response = "😃"
+      }
+      if (response === "sad") {
+        response = "😢"
+      }
+      if (response === "surprised") {
+        response = "😲"
+      }
+      //return response === this.quiz.questions[this.quiz.pos][1];
+      //return response === this.actualQuestion.allAnswers[0]
+      if (this.actualQuestion.correct_answer.includes(response)) {
+        return true
+      }
     }
   },
   mounted() {
@@ -98,7 +136,7 @@ export default {
     .catch(e => {
       console.log(e)
     })
-    this.getNewQuestion();
+    //this.getNewQuestion();
   }
 };
 </script>
