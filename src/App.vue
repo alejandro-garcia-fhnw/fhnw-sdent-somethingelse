@@ -2,18 +2,35 @@
   <v-app id="app">
     <div class="container">
       <h1 style="font-size: 3rem">something<span class="red--text">else</span></h1>
-      <Game/>
+      <Game v-if="lostRounds < 5" @photos="getPhotos"/>
+      <EndGame v-if="lostRounds > 4" :photos="this.photos" @play-again="playAgain"/>
     </div>
   </v-app>
 </template>
 
 <script>
 import Game from "./components/Game.vue";
+import EndGame from "./components/EndGame.vue"
 
 export default {
   name: "App",
   components: {
+    EndGame,
     Game
+  },
+  data: () => ({
+    photos: [],
+    lostRounds: 0
+  }),
+  methods: {
+    getPhotos(photos) {
+      this.photos = photos
+      this.lostRounds = this.photos.length
+    },
+    playAgain() {
+      this.photos = null
+      this.lostRounds = 0
+    }
   }
 };
 </script>

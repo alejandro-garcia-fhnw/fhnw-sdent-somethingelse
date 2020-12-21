@@ -112,13 +112,19 @@ export default {
       if (response === "surprised") {
         response = "😲"
       }
+      if (response === "angry") {
+        response = "😡"
+      }
       //return response === this.quiz.questions[this.quiz.pos][1];
       //return response === this.actualQuestion.allAnswers[0]
       if (this.actualQuestion.correct_answer.includes(response)) {
         this.updateScore(1)
         this.getNewQuestion()
         return true
-      }
+      }/*if (this.actualQuestion.correct_answer.includes) {
+        console.log("wrong answer")
+        this.$emit('capture-photo')
+      }*/
     },
     updateScore (amount){
       this.$emit('score', this.score + amount)

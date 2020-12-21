@@ -1,20 +1,14 @@
 <template>
   <div id="game" ref="game">
-    <Score class="mb-16" :score="this.score"></Score>
+    <Score class="mb-16 mt-3" :score="this.score"></Score>
   <div>
     <video @click="capturePhoto" ref="video" width="480" height="320" autoplay muted/>
   </div>
 
     <canvas ref="canvas" id="canvas" width="320" height="240" hidden></canvas>
-    <ul>
-      <li v-for="c in captures">
-        <img v-bind:src="c" height="50" />
-      </li>
-    </ul>
 
-
-    <Detect ref="detect" @detected="onDetect"/>
-    <Quiz ref="quiz" @score="updateScore"/>
+    <Detect class="mb-5" ref="detect" @detected="onDetect"/>
+    <Quiz ref="quiz" @score="updateScore" @capture-photo="capturePhoto"/>
   </div>
 </template>
 
@@ -39,7 +33,7 @@ export default {
     }
   },
   mounted() {
-    this.video = this.$refs.video;
+    this.video = this.$refs.video; //needed for video capture
 
 
     const video = this.$refs.video;
@@ -56,6 +50,7 @@ export default {
       let context = this.canvas.getContext("2d").drawImage(this.video, 0, 0, 320, 240);
       this.captures.push(canvas.toDataURL("image/png"));
       console.log("photo taken!")
+      this.$emit('photos', this.captures)
     },
 
     startRecording(video) {
