@@ -48,6 +48,9 @@ export default {
   }),
   methods: {
 
+    /*
+    * Shuffelt den Array, wird für allAnswers gebraucht
+    */
     shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
@@ -55,9 +58,13 @@ export default {
       }
     },
 
+    /*
+    * wählt zufälles Fragen-Objekt aus
+    * packt die falschen und die richtigen antworten in ein Array von allAnswers und mischelt den Array
+    */
     getNewQuestion() {
       let randomQuestion = this.questions[Math.floor(Math.random() * this.questions.length)]
-      if (!randomQuestion.allAnswers) {
+      if (!randomQuestion.allAnswers) { //prüft ob das Object schon ein allAnswers Array hat
         let allAnswers = randomQuestion.incorrect_answers
         allAnswers.push(randomQuestion.correct_answer)
         this.shuffle(allAnswers)
