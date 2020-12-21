@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "node-fetch": "^2.6.1",
+    "surge": "^0.21.7",
     "vue": "^2.6.11",
     "vuetify": "^2.3.4"
   },
