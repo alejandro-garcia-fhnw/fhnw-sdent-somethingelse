@@ -45,8 +45,6 @@ export default {
     questions : [],
     smiles : ["😢","😲","😡","😃"],
     randomSmile: null,
-
-
     actualQuestion: null
   }),
   methods: {
@@ -121,6 +119,8 @@ export default {
     axios.get(url).then(response => {
       this.questions = response.data.results
       console.log('Questions loaded')
+      this.getNewQuestion()
+
     })
     .catch(e => {
       console.log(e)
