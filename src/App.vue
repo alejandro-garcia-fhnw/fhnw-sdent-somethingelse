@@ -2,8 +2,8 @@
   <v-app id="app">
     <div class="container">
       <Onboarding v-if="onboarding" @start-game="onboarding = false"/>
-      <Game v-if="lostRounds < 5" @photos="getPhotos"/>
-      <EndGame v-if="lostRounds > 4" :photos="this.photos" @play-again="playAgain"/>
+      <Game v-if="!onboarding && lostRounds < 5" @photos="getPhotos"/>
+      <EndGame v-if="!onboarding && lostRounds > 4" :photos="this.photos" @play-again="playAgain"/>
     </div>
   </v-app>
 </template>
