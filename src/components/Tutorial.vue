@@ -172,6 +172,7 @@
                 class="ml-2"
                 color="primary"
                 @click="startGame"
+
             >
               Start
             </v-btn>
