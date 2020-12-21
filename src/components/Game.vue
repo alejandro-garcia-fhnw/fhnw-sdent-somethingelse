@@ -1,5 +1,6 @@
 <template>
   <div id="game" ref="game">
+    <h1 style="font-size: 3rem">something<span class="red--text">else</span></h1>
     <Score class="mb-16 mt-3" :score="this.score"></Score>
   <div>
     <video @click="capturePhoto" ref="video" width="480" height="320" autoplay muted/>

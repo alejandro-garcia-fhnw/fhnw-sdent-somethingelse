@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <div class="container">
-      <h1 style="font-size: 3rem">something<span class="red--text">else</span></h1>
+      <Onboarding v-if="onboarding" @start-game="onboarding = false"/>
       <Game v-if="lostRounds < 5" @photos="getPhotos"/>
       <EndGame v-if="lostRounds > 4" :photos="this.photos" @play-again="playAgain"/>
     </div>
@@ -11,16 +11,19 @@
 <script>
 import Game from "./components/Game.vue";
 import EndGame from "./components/EndGame.vue"
+import Onboarding from "@/components/Onboarding";
 
 export default {
   name: "App",
   components: {
+    Onboarding,
     EndGame,
     Game
   },
   data: () => ({
     photos: [],
-    lostRounds: 0
+    lostRounds : 0,
+    onboarding : true
   }),
   methods: {
     getPhotos(photos) {

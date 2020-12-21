@@ -5,7 +5,7 @@
         <h1 style="font-size: 5rem">something<span class="red--text">else 😉</span></h1>
         <div>
           <v-btn class="mr-2" x-large>Tutorial</v-btn>
-          <v-btn class="ml-2" x-large>Start Game</v-btn>
+          <v-btn @click="startGame" class="ml-2" x-large>Start Game</v-btn>
         </div>
       </div>
     </div>
@@ -14,6 +14,11 @@
 
 <script>
 export default {
+  methods: {
+    startGame () {
+      this.$emit('start-game')
+    }
+  },
 name: "Onboarding"
 }
 </script>
