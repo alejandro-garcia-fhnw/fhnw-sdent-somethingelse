@@ -1,9 +1,12 @@
 <template>
   <div class="detect">
-    <div id="expression" ref="expression">
-      {{ emotes.default }}
-    </div>
-    <progress ref="progress" value="0" min="0" max="10" />
+
+    <v-progress-circular class="amber--text" size="190" :value="this.progress" width="12" id="progressbar">
+      <div id="expression" ref="expression">
+        {{ emotes.default }}
+      </div>
+    </v-progress-circular>
+    <progress ref="progress" value="0" min="0" max="10" hidden/>
   </div>
 </template>
 
@@ -28,7 +31,8 @@ export default {
       'default' : '😶'
     }),
     expressionScores : Object.freeze({}),
-    counter : {}
+    counter : {},
+    progress: 0
   }),
   methods: {
     init() {
@@ -61,6 +65,7 @@ export default {
       let count = this.counter[expression] || 0;
       this.counter = Object.freeze({ [expression] : ++count });
       this.$refs.progress.value = expression ? count : 0;
+      this.progress = 10 * (expression ? count : 0)
       this.$refs.expression.innerHTML = this.emotes[expression] || this.emotes.default;
       if (!expression || count > this.detect.lockCount) {
         this.$emit("detected", expression);
@@ -79,5 +84,8 @@ export default {
 }
 #expression {
   font-size: 200px;
+}
+#progressbar {
+
 }
 </style>

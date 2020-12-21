@@ -5,26 +5,30 @@
       <div ref="question" class="hidden">?</div>
       <button @click="nextQuestion">Next</button>
     </div>-->
-
     <v-row>
       <v-col align="center">
-        <v-card width="800px" height="200" v-if="actualQuestion">
-          <v-card-title>{{actualQuestion.question}}</v-card-title>
+        <v-card width="800px" height="220" v-if="actualQuestion">
+          <v-card-title>
+            <v-spacer></v-spacer>
+            {{actualQuestion.question}}
+            <v-spacer></v-spacer>
+          </v-card-title>
+          <v-card-text>
+
+            <v-row class="mt-0">
+              <v-col lg12>
+                <v-btn class="ml-1 mb-1" width="380" style="font-size: 1.5rem" x-large  v-for="a in actualQuestion.allAnswers" :key="a"> {{ a }}</v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
           <v-card-actions style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 0;">
-            <v-spacer></v-spacer>
-            <v-btn style="font-size: 1.5rem" x-large color="primary"  v-for="a in actualQuestion.allAnswers" :key="a"> {{ a }}</v-btn>
-<!--            <v-btn color="primary" large> <span style="font-size: 2.5rem" class="mr-3">{{ emotes[Math.floor(Math.random() * emotes.length)] }}</span> {{ actualQuestion.correct_answer}}</v-btn>-->
-            <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
+        <div>
+          <v-btn @click="getNewQuestion()">Skip</v-btn>
+        </div>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col align="center">
-        <v-btn @click="getNewQuestion()">Next</v-btn>
-      </v-col>
-    </v-row>
-
   </div>
 </template>
 
@@ -45,7 +49,8 @@ export default {
     questions : [],
     smiles : ["😢","😲","😡","😃"],
     randomSmile: null,
-    actualQuestion: null
+    actualQuestion: null,
+    score: 0
   }),
   methods: {
 
@@ -110,8 +115,13 @@ export default {
       //return response === this.quiz.questions[this.quiz.pos][1];
       //return response === this.actualQuestion.allAnswers[0]
       if (this.actualQuestion.correct_answer.includes(response)) {
+        this.updateScore(1)
+        this.getNewQuestion()
         return true
       }
+    },
+    updateScore (amount){
+      this.$emit('score', this.score + amount)
     }
   },
   mounted() {

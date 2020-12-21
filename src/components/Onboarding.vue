@@ -7,12 +7,9 @@
           <v-btn class="mr-2" x-large>Tutorial</v-btn>
           <v-btn class="ml-2" x-large>Start Game</v-btn>
         </div>
-
       </div>
-
     </div>
   </v-app>
-
 </template>
 
 <script>

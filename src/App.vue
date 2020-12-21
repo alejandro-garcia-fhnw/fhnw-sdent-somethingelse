@@ -1,6 +1,9 @@
 <template>
   <v-app id="app">
-    <Game />
+    <div class="container">
+      <h1 style="font-size: 3rem">something<span class="red--text">else</span></h1>
+      <Game/>
+    </div>
   </v-app>
 </template>
 
@@ -17,6 +20,7 @@ export default {
 
 <style>
 #app {
+  align-content: center;
   font-family: Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,5 +42,12 @@ h2 {
 }
 .red {
   background-color: orangered;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 </style>
