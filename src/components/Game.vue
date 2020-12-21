@@ -1,6 +1,6 @@
 <template>
   <div id="game" ref="game">
-    <h1 style="font-size: 3rem">something<span class="red--text">else</span></h1>
+    <h1 @click="reloadPage" style="font-size: 3rem; cursor: pointer">something<span class="red--text">else</span></h1>
     <Score class="mb-16 mt-3" :score="this.score"></Score>
   <div>
     <video @click="capturePhoto" ref="video" width="480" height="320" autoplay muted/>
@@ -43,6 +43,9 @@ export default {
     detect.init().then(() => { this.startRecording(video); });
   },
   methods: {
+    reloadPage(){
+      window.location.reload()
+    },
     updateScore(score) {
       this.score += score
     },

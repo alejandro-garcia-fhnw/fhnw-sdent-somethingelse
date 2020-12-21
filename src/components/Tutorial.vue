@@ -52,7 +52,7 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-              <v-btn text class="red darken-2 mr-2" dark>
+              <v-btn text class="red darken-2 mr-2" dark @click="cancel">
                 X
               </v-btn>
               <v-spacer></v-spacer>
@@ -76,7 +76,7 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-            <v-btn text class="red darken-2 mr-2" dark>
+            <v-btn text class="red darken-2 mr-2" dark @click="cancel">
               X
             </v-btn>
             <v-progress-linear
@@ -104,7 +104,7 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-            <v-btn text class="red darken-2 mr-2" dark>
+            <v-btn text class="red darken-2 mr-2" dark @click="cancel">
               X
             </v-btn>
             <v-progress-linear
@@ -132,7 +132,7 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-            <v-btn text class="red darken-2 mr-2" dark>
+            <v-btn text class="red darken-2 mr-2" dark @click="cancel">
               X
             </v-btn>
             <v-progress-linear
@@ -160,7 +160,7 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-            <v-btn text class="red darken-2 mr-2" dark>
+            <v-btn text class="red darken-2 mr-2" dark @click="cancel">
               X
             </v-btn>
             <v-progress-linear
@@ -171,7 +171,7 @@
             <v-btn
                 class="ml-2"
                 color="primary"
-                @click="e1 = 6"
+                @click="startGame"
             >
               Start
             </v-btn>
@@ -188,6 +188,14 @@ export default {
   data () {
     return {
       e1: 1,
+    }
+  },
+  methods: {
+    cancel () {
+      this.$emit('cancel')
+    },
+    startGame () {
+      this.$emit('start-game')
     }
   },
 }
