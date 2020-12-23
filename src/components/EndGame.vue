@@ -24,10 +24,13 @@
 
 <script>
 export default {
-  props: ['photos'],
+  name: 'EndGame',
+  props: {
+    'photos' : Array
+  },
   methods: {
     playAgain () {
-      this.$emit('play-again')
+      this.$emit('play-again');
     }
   }
 }

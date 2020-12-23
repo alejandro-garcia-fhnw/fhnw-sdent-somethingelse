@@ -7,7 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "lottie-vuejs": "^0.4.0",
     "node-fetch": "^2.6.1",
     "surge": "^0.21.7",

@@ -14,9 +14,11 @@
 
 <script>
 export default {
-  props: ['score'],
+  name: 'Score',
+  props: {
+    'score': Number
+  },
 }
-
 </script>
 
 <style scoped>

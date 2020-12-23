@@ -30,24 +30,22 @@ import Tutorial from "@/components/Tutorial";
 import LottieAnimation from "lottie-vuejs/src/LottieAnimation.vue";
 
 export default {
+  name: 'Onboarding',
   components: {
     Tutorial,
     LottieAnimation
   },
+  data: () => ({
+    showTutorial: false
+  }),
   methods: {
-    startGame () {
-      this.$emit('start-game')
+    startGame() {
+      this.$emit('start-game');
     },
-    toggleTutorial () {
-      this.showTutorial = !this.showTutorial
+    toggleTutorial() {
+      this.showTutorial = !this.showTutorial;
     }
-  },
-  data () {
-    return {
-      showTutorial : false
-    }
-  },
-name: "Onboarding"
+  }
 }
 </script>
 

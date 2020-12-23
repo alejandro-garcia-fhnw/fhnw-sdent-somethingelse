@@ -1,12 +1,15 @@
 <template>
   <div class="detect">
-
-    <v-progress-circular class="amber--text" size="190" :value="this.progress" width="12" id="progressbar">
+    <v-progress-circular
+        id="progressbar"
+        class="amber--text"
+        size="190"
+        width="12"
+        :value="this.progress">
       <div id="expression" ref="expression">
-        {{ emotes.default }}
+        {{ currentEmote }}
       </div>
     </v-progress-circular>
-    <progress ref="progress" value="0" min="0" max="10" hidden/>
   </div>
 </template>
 
@@ -14,63 +17,72 @@
 import * as faceapi from '@/plugins/face-api.js';
 
 export default {
-  name: "Detect",
+  name: 'Detect',
+  props: {
+    emoteMap : Map
+  },
   data: () => ({
-    detect : Object.freeze({
-      options : new faceapi.TinyFaceDetectorOptions(),
-      interval : 100,
-      minScore : 0.7,
-      lockCount : 10
+    detect: Object.freeze({
+      options: new faceapi.TinyFaceDetectorOptions(),
+      interval: 100,
+      minScore: 0.7,
+      lockCount: 10
     }),
-    emotes : Object.freeze({
-      'angry' : '😡',
-      'sad' : '😢',
-      'surprised' : '😲',
-      'happy' : '😃',
-      'neutral' : '😶',
-      'default' : '😶'
-    }),
-    expressionScores : Object.freeze({}),
-    counter : {},
+    input: null,
+    interval: null,
+    scores: Object.freeze({}),
+    currentExpression: 'neutral',
+    counter: Object.freeze({}),
     progress: 0
   }),
+  computed: {
+    currentEmote() {
+      return this.emoteMap.get(this.currentExpression) || this.emoteMap.get('neutral');
+    }
+  },
   methods: {
-    init() {
+    init(input) {
       return Promise.all([
+        new Promise((resolve, reject) => input ? resolve() : reject('illegal detect input')),
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
         faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
         faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
         faceapi.nets.faceExpressionNet.loadFromUri('/models')
-      ]);
+      ]).then(() => this.input = input);
     },
-    startDetection(input) {
-      setInterval(async () => {
+    start() {
+      this.scores = Object.freeze({});
+      this.interval = setInterval(async () => {
         const detection = await faceapi
-            .detectSingleFace(input, this.detect.options)
+            .detectSingleFace(this.input, this.detect.options)
             .withFaceExpressions();
         if (detection && detection.expressions) {
-          this.expressionScores = Object.freeze(detection.expressions);
+          this.scores = Object.freeze(detection.expressions);
         } else {
           console.log('unable to detect any expressions');
-          this.expressionScores = Object.freeze({});
+          this.scores = Object.freeze({});
         }
       }, this.detect.interval);
+      console.debug('started');
+    },
+    stop() {
+      clearInterval(this.interval);
+      console.debug('stopped');
     }
   },
   watch: {
-    expressionScores: function() {
-      const expression = Object.keys(this.expressionScores)
-          .filter(key => this.expressionScores[key] >= this.detect.minScore)
-          .find(key => key !== 'neutral') || '';
-      let count = this.counter[expression] || 0;
-      this.counter = Object.freeze({ [expression] : ++count });
-      this.$refs.progress.value = expression ? count : 0;
-      this.progress = 10 * (expression ? count : 0)
-      this.$refs.expression.innerHTML = this.emotes[expression] || this.emotes.default;
-      if (!expression || count > this.detect.lockCount) {
-        this.$emit("detected", expression);
+    scores: function() {
+      this.currentExpression = Object.keys(this.scores)
+          .filter(key => this.scores[key] >= this.detect.minScore)
+          .filter(key => key !== 'neutral')
+          .reduce((a, b) => this.scores[a] >= this.scores[b] ? a : b, '') || '';
+      let count = this.counter[this.currentExpression] || 0;
+      this.counter = Object.freeze({ [this.currentExpression] : ++count });
+      this.progress = (100 / this.detect.lockCount) * (this.currentExpression ? count : 0)
+      if (!this.currentExpression || count > this.detect.lockCount) {
+        this.$emit("detected", this.currentExpression);
       }
-      console.debug(this.counter[expression], expression);
+      console.debug(this.counter[this.currentExpression], this.currentExpression);
     }
   }
 };
@@ -85,7 +97,9 @@ export default {
 #expression {
   font-size: 200px;
 }
-#progressbar {
-
+</style>
+<style>
+#progressbar .v-progress-circular__overlay {
+  transition: all 0.1s ease-in-out;
 }
 </style>

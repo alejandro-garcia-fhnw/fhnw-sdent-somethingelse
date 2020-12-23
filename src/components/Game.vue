@@ -1,15 +1,19 @@
 <template>
   <div id="game" ref="game">
     <h1 @click="reloadPage" style="font-size: 3rem; cursor: pointer">something<span class="red--text">else</span></h1>
-    <Score class="mb-16 mt-3" :score="this.score"></Score>
-  <div>
-    <video @click="capturePhoto" ref="video" width="480" height="320" autoplay muted playsinline/>
-  </div>
-
-    <canvas ref="canvas" id="canvas" width="320" height="240" hidden></canvas>
-
-    <Detect class="mb-5" ref="detect" @detected="onDetect"/>
-    <Quiz ref="quiz" @score="updateScore" @capture-photo="capturePhoto"/>
+    <Score class="mb-16 mt-3" :score="score"></Score>
+    <div class="videoWrapper">
+      <video ref="video"
+          @click="capturePhoto" width="250" height="250"
+          autoplay muted playsinline/>
+    </div>
+    <Detect ref="detect"
+        class="mb-5"
+        :emoteMap="emoteMap"
+        @detected="onDetect"/>
+    <Quiz ref="quiz"
+        :emoteMap="emoteMap"
+        @capture-photo="capturePhoto"/>
   </div>
 </template>
 
@@ -19,46 +23,51 @@ import Quiz from "./Quiz.vue";
 import Score from "./Score"
 
 export default {
-  name: "Game",
+  name: 'Game',
   components: {
     Score,
     Detect,
     Quiz
   },
-  data() {
-    return {
-      video: {},
-      canvas: {},
-      captures: [],
-      score: 0
-    }
-  },
+  data: () => ({
+    emoteMap: Object.freeze(new Map([
+      ['happy', '😃'],
+      ['surprised', '😲'],
+      ['angry', '😡'],
+      ['sad', '😢'],
+      ['neutral', '😶']
+    ])),
+    score: 0,
+    nextQuestionTimeout: 2000,
+    captures: []
+  }),
   mounted() {
-    this.video = this.$refs.video; //needed for video capture
-
-
     const video = this.$refs.video;
     const detect = this.$refs.detect;
-    video.addEventListener('play', () => { detect.startDetection(video); });
-    detect.init().then(() => { this.startRecording(video); });
+    const quiz = this.$refs.quiz;
+    video.addEventListener('play', () => { detect.start(); });
+    Promise.all([ quiz.init(), detect.init(video) ])
+        .then(() => { quiz.start(); })
+        .then(() => { this.startRecording(video); })
+        .catch(error => { console.warn('init failed', error); });
   },
   methods: {
     reloadPage(){
       window.location.reload()
     },
-    updateScore(score) {
-      this.score += score
-    },
     capturePhoto() {
-      this.canvas = this.$refs.canvas;
-      let context = this.canvas.getContext("2d").drawImage(this.video, 0, 0, 320, 240);
+      const canvas = document.createElement("canvas");
+      canvas.width = this.$refs.video.videoWidth;
+      canvas.height = this.$refs.video.videoHeight;
+      canvas.getContext("2d").drawImage(this.$refs.video, 0, 0);
       this.captures.push(canvas.toDataURL("image/png"));
-      console.log("photo taken!")
-      this.$emit('photos', this.captures)
+      console.log("photo taken!");
+      this.$emit('photos', this.captures);
     },
-
     startRecording(video) {
-      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+      navigator.getUserMedia = navigator.getUserMedia
+          || navigator.webkitGetUserMedia
+          || navigator.mozGetUserMedia;
       navigator.getUserMedia(
         { video: {} },
         stream => video.srcObject = stream,
@@ -66,13 +75,13 @@ export default {
       );
     },
     onDetect(expression) {
-      const quiz = this.$refs.quiz;
-      if (!expression) {
-        this.$refs.game.classList = '';
-      } else if /*(!quiz.isStarted() ||*/ (quiz.answer(expression)) {
-        this.$refs.game.classList.add('green');
-      } else {
-        this.$refs.game.classList.add('red');
+      if (expression && this.$refs.quiz.isStarted()) {
+        this.score += this.$refs.quiz.answer(expression);
+        this.$refs.detect.stop();
+        setTimeout(() => {
+          this.$refs.quiz.nextQuestion();
+          this.$refs.detect.start();
+        }, this.nextQuestionTimeout);
       }
     }
   }
@@ -90,7 +99,7 @@ export default {
   /*justify-content: center;*/
   align-items: center;
 }
-video {
+#game video {
   width: 250px;
   height: 250px;
   position: absolute;

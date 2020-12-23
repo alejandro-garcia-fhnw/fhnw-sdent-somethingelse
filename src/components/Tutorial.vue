@@ -186,17 +186,16 @@
 
 <script>
 export default {
-  data () {
-    return {
-      e1: 1,
-    }
-  },
+  name: 'Tutorial',
+  data: () => ({
+    e1: 1,
+  }),
   methods: {
     cancel () {
-      this.$emit('cancel')
+      this.$emit('cancel');
     },
     startGame () {
-      this.$emit('start-game')
+      this.$emit('start-game');
     }
   },
 }
