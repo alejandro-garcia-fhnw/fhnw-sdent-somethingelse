@@ -3,17 +3,17 @@
     <v-row>
       <v-col align="center">
         <v-card width="800px" height="220"
-            v-if="this.current">
+            v-if="currentTrivia">
           <v-card-title>
             <v-spacer></v-spacer>
-            <span v-html="current.question"/>
+            <span v-html="currentTrivia.question"/>
             <v-spacer></v-spacer>
           </v-card-title>
           <v-card-text>
             <v-row class="mt-0">
               <v-col lg12>
                 <v-btn
-                    v-for="(answer, index) in current.all_answers"
+                    v-for="(answer, index) in currentTrivia.all_answers"
                     :key="index"
                     class="answer ml-1 mb-1"
                     :class="revealAnswer(index)"
@@ -38,8 +38,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-const opentdbUrl = 'https://opentdb.com/api.php?amount=30&category=9&difficulty=easy&type=multiple';
+import opentdb from 'opentdb-api';
 
 export default {
   name: 'Quiz',
@@ -47,8 +46,14 @@ export default {
     emoteMap: Map
   },
   data: () => ({
-    quizData: [],
-    current: null,
+    triviaOptions: Object.freeze({
+      amount: 1,
+      category: 'general', //'any'
+      difficulty: 'easy',
+      type: 'multiple'
+    }),
+    triviaLoader: null,
+    currentTrivia: null,
     score: 0
   }),
   computed: {
@@ -61,38 +66,45 @@ export default {
   },
   methods: {
     init() {
-      // load questions from Open Trivia Database
-      return axios.get(opentdbUrl).then(response => {
-        this.quizData = response.data.results;
-        console.log('Questions loaded');
+      return opentdb.getToken()
+        .then(token => this.triviaOptions = Object.freeze(
+            Object.assign({token: token}, this.triviaOptions)))
+        .then(() => this.triviaLoader = this.getTriviaLoader());
+    },
+    getTriviaLoader() {
+      return opentdb.getTrivia(this.triviaOptions).then(results => {
+        console.debug('question loaded', results[0]);
+        return results[0];
       });
     },
     isStarted() {
-      return this.current;
+      return this.currentTrivia;
     },
     start() {
       this.nextQuestion();
     },
     nextQuestion() {
-      const randomIndex = Math.floor(Math.random() * this.quizData.length);
-      // TODO blacklist picked question
-      this.current = this.quizData[randomIndex];
-      this.current.all_answers = Object.freeze(this.shuffle([
-        ...this.current.incorrect_answers,
-        this.current.correct_answer
-      ]));
-      // find correct answer index again after shuffle of all possible answers
-      this.current.correct_answer_index = this.current.all_answers
-          .map((answer, index) => (answer === this.current.correct_answer) ? index : -1)
-          .find(index => index >= 0);
-      console.log('nextQuestion:', this.current.correct_answer_index);
+      this.triviaLoader.then(trivia => {
+        trivia.all_answers = Object.freeze(this.shuffle([
+          ...trivia.incorrect_answers,
+          trivia.correct_answer
+        ]));
+        // find correct answer index again after shuffle of all possible answers
+        trivia.correct_answer_index = trivia.all_answers
+            .map((answer, index) => (answer === trivia.correct_answer) ? index : -1)
+            .find(index => index >= 0);
+        this.currentTrivia = trivia;
+        console.log('nextQuestion:', trivia.correct_answer_index);
+      }).then(() => {
+        this.triviaLoader = this.getTriviaLoader(); // preload the next question 
+      });
     },
     answer(response) {
       let points = 0;
-      if (this.current && !this.current.given_answer) {
+      if (this.currentTrivia && !this.currentTrivia.given_answer) {
         console.log('given answer:', response);
-        this.$set(this.current, 'given_answer', response);
-        if (response === this.expressions[this.current.correct_answer_index]) {
+        this.$set(this.currentTrivia, 'given_answer', response);
+        if (response === this.expressions[this.currentTrivia.correct_answer_index]) {
           points = 1;
         } else {
           console.log("wrong answer")
@@ -102,10 +114,10 @@ export default {
       return points;
     },
     revealAnswer(index) {
-      if (this.current.given_answer) {
-        if (this.current.correct_answer_index == index) {
+      if (this.currentTrivia.given_answer) {
+        if (this.currentTrivia.correct_answer_index == index) {
           return 'green';
-        } else if (this.current.given_answer === this.expressions[index]) {
+        } else if (this.currentTrivia.given_answer === this.expressions[index]) {
           return 'red';
         }
       }
