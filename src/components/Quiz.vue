@@ -6,7 +6,19 @@
             v-if="currentTrivia">
           <v-card-title>
             <v-spacer></v-spacer>
+
             <span v-html="currentTrivia.question"/>
+
+<!--        Funktioniert immernonig :-) has jetzt uf mehreri Arte Probiert, es lauft nur bim erste mol.
+
+            <vue-typed-js :stringsElement="'#test'" :showCursor="false" :contentType="'html'">
+               <p class="typing"></p>
+             </vue-typed-js>
+             <div id="test" style="display: none">
+               <p>{{ currentTrivia.question }}</p>
+             </div>
+ -->
+
             <v-spacer></v-spacer>
           </v-card-title>
           <v-card-text>
@@ -38,6 +50,7 @@
 </template>
 
 <script>
+
 import opentdb from 'opentdb-api';
 
 export default {
@@ -96,7 +109,7 @@ export default {
         this.currentTrivia = trivia;
         console.log('nextQuestion:', trivia.correct_answer_index);
       }).then(() => {
-        this.triviaLoader = this.getTriviaLoader(); // preload the next question 
+        this.triviaLoader = this.getTriviaLoader(); // preload the next question
       });
     },
     answer(response) {
