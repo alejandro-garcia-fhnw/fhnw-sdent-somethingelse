@@ -54,7 +54,8 @@ export default {
     }),
     triviaLoader: null,
     currentTrivia: null,
-    score: 0
+    triviaCount: 0,
+    maxTrivia: 10
   }),
   computed: {
     expressions() {
@@ -71,6 +72,9 @@ export default {
             Object.assign({token: token}, this.triviaOptions)))
         .then(() => this.triviaLoader = this.getTriviaLoader());
     },
+    reset() {
+      return opentdb.resetToken(this.triviaOptions.token);
+    },
     getTriviaLoader() {
       return opentdb.getTrivia(this.triviaOptions).then(results => {
         console.debug('question loaded', results[0]);
@@ -84,20 +88,29 @@ export default {
       this.nextQuestion();
     },
     nextQuestion() {
-      this.triviaLoader.then(trivia => {
-        trivia.all_answers = Object.freeze(this.shuffle([
-          ...trivia.incorrect_answers,
-          trivia.correct_answer
-        ]));
-        // find correct answer index again after shuffle of all possible answers
-        trivia.correct_answer_index = trivia.all_answers
-            .map((answer, index) => (answer === trivia.correct_answer) ? index : -1)
-            .find(index => index >= 0);
-        this.currentTrivia = trivia;
-        console.log('nextQuestion:', trivia.correct_answer_index);
-      }).then(() => {
-        this.triviaLoader = this.getTriviaLoader(); // preload the next question 
-      });
+      if (this.triviaCount < this.maxTrivia) {
+        this.triviaLoader.then(trivia => {
+          this.currentTrivia = buildTrivia(trivia);
+          this.triviaCount++;
+          console.log('nextQuestion:', trivia.correct_answer_index);
+        }).then(() => {
+          this.triviaLoader = this.getTriviaLoader(); // preload the next question 
+        });
+        return true;
+      } else {
+        this.currentTrivia = null;
+        // TODO emit end?
+      }
+    },
+    buildTrivia(trivia) {
+      trivia.all_answers = Object.freeze(this.shuffle([
+        ...trivia.incorrect_answers,
+        trivia.correct_answer
+      ]));
+      // find correct answer index again after shuffle of all possible answers
+      trivia.correct_answer_index = trivia.all_answers
+          .map((answer, index) => (answer === trivia.correct_answer) ? index : -1)
+          .find(index => index >= 0);
     },
     answer(response) {
       let points = 0;

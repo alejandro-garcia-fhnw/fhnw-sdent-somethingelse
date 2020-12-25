@@ -52,7 +52,7 @@ export default {
         .catch(error => { console.warn('init failed', error); });
   },
   methods: {
-    reloadPage(){
+    reloadPage() {
       window.location.reload()
     },
     capturePhoto() {
@@ -79,8 +79,8 @@ export default {
         this.score += this.$refs.quiz.answer(expression);
         this.$refs.detect.stop();
         setTimeout(() => {
-          this.$refs.quiz.nextQuestion();
-          this.$refs.detect.start();
+          this.$refs.quiz.nextQuestion()
+            && this.$refs.detect.start();
         }, this.nextQuestionTimeout);
       }
     }
