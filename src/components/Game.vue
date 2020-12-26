@@ -1,20 +1,27 @@
 <template>
   <div id="game" ref="game">
-    <h1 @click="reloadPage" style="font-size: 3rem; cursor: pointer">something<span class="red--text">else</span></h1>
-    <Score class="mb-16 mt-3" :score="score"></Score>
-    <div class="videoWrapper">
-      <video ref="video"
-          @click="capturePhoto" width="250" height="250"
-          autoplay muted playsinline/>
+    <h1 class="text-h3 font-weight-bold mb-8">
+      something<span class="red--text">else</span>
+    </h1>
+    <v-progress-circular class="spinner" indeterminate color="red" :size="70" :width="7"
+        v-if="!loaded"/>
+    <div class="container" v-show="loaded">
+      <Score class="mb-16" :score="score"></Score>
+      <Detect ref="detect"
+          class="mb-5"
+          :emoteMap="emoteMap"
+          @detected="onDetect"/>
+      <Quiz ref="quiz" class="mb-8"
+          :emoteMap="emoteMap"
+          @end-quiz="endGame"
+          @capture-photo="capturePhoto"/>
+      <v-btn large @click="endGame">Quit</v-btn>
+      <div class="videoWrapper">
+        <video ref="video"
+            @click="capturePhoto" width="250" height="250"
+            autoplay muted playsinline/>
+      </div>
     </div>
-    <Detect ref="detect"
-        class="mb-5"
-        :emoteMap="emoteMap"
-        @detected="onDetect"/>
-    <Quiz ref="quiz"
-        :emoteMap="emoteMap"
-        @end-quiz="endGame"
-        @capture-photo="capturePhoto"/>
   </div>
 </template>
 
@@ -34,6 +41,7 @@ export default {
       ['sad', '😢'],
       ['neutral', '😶']
     ])),
+    loaded: false,
     score: 0,
     nextQuestionTimeout: 2000,
     captures: []
@@ -46,6 +54,7 @@ export default {
     Promise.all([ quiz.init(), detect.init(video) ])
         .then(() => { quiz.start(); })
         .then(() => { this.startRecording(video); })
+        .then(() => { this.loaded = true; })
         .catch(error => { console.warn('init failed', error); });
   },
   methods: {
@@ -92,20 +101,21 @@ export default {
 
 <style scoped>
 #game {
-  margin: 0;
+  margin: auto;
   padding: 0;
-  width: 100vw;
-  height: 100vh;
+  width: fit-content;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   /*justify-content: center;*/
   align-items: center;
+  position: relative;
 }
 #game video {
   width: 250px;
   height: 250px;
   position: absolute;
-  top: 0px;
+  top: 50px;
   left: 0px;
   border-radius: 50%;
   margin: 20px;
