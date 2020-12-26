@@ -13,7 +13,7 @@
         </v-btn>
       </div>
       <div class="container" v-if="!hasVideoAccess">
-        <lottie-animation class="mb-4" width="50" height="50" path="animations/face.json"/>
+        <lottie-animation class="mb-4" :width="50" :height="50" path="animations/face.json"/>
         <p>
           Please allow
           <span class="font-weight-bold">something

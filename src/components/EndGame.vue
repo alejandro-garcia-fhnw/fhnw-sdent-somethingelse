@@ -1,11 +1,14 @@
 <template>
   <div align="center">
-    <h1>Game over</h1>
+    <h1 class="text-h3 font-weight-bold mt-8 mb-8">
+      game <span class="red--text">over</span>
+    </h1>
+    <Score :score="gameResult.score"></Score>
     <v-row>
-      <v-col lg12 v-for="(photo, index) in photos" :key="index">
-          <div class="polaroid mt-15">
+      <v-col lg12 v-for="(photo, index) in gameResult.photos" :key="index">
+          <div class="polaroid mt-8">
             <p>Snapshot {{ index + 1}}</p>
-            <img :src="photo" height="250"/>
+            <img :src="photo" :alt="index" height="250"/>
           </div>
       </v-col>
     </v-row>
@@ -18,13 +21,14 @@
 </template>
 
 <script>
+import Score from "@/components/Score"
 import Leaderboard from "@/components/Leaderboard";
 
 export default {
   name: 'EndGame',
-  components: { Leaderboard },
+  components: { Score, Leaderboard },
   props: {
-    'photos' : Array
+    gameResult: Object
   },
   methods: {
   }
@@ -32,6 +36,9 @@ export default {
 </script>
 
 <style scoped>
+.v-card {
+  width: fit-content;
+}
 .polaroid {
   position: relative;
   width: 320px;

@@ -13,8 +13,7 @@
           @detected="onDetect"/>
       <Quiz ref="quiz" class="mb-8"
           :emoteMap="emoteMap"
-          @end-quiz="endGame"
-          @capture-photo="capturePhoto"/>
+          @end-quiz="endGame"/>
       <v-btn large @click="endGame">Quit</v-btn>
       <div class="videoWrapper">
         <video ref="video"
@@ -26,9 +25,9 @@
 </template>
 
 <script>
-import Detect from "./Detect.vue";
-import Quiz from "./Quiz.vue";
-import Score from "./Score"
+import Detect from "@/components/Detect.vue";
+import Quiz from "@/components/Quiz.vue";
+import Score from "@/components/Score"
 
 export default {
   name: 'Game',
@@ -41,10 +40,10 @@ export default {
       ['sad', '😢'],
       ['neutral', '😶']
     ])),
+    nextQuestionTimeout: 2000,
     loaded: false,
     score: 0,
-    nextQuestionTimeout: 2000,
-    captures: []
+    photos: []
   }),
   mounted() {
     const video = this.$refs.video;
@@ -58,15 +57,6 @@ export default {
         .catch(error => { console.warn('init failed', error); });
   },
   methods: {
-    capturePhoto() {
-      const canvas = document.createElement("canvas");
-      canvas.width = this.$refs.video.videoWidth;
-      canvas.height = this.$refs.video.videoHeight;
-      canvas.getContext("2d").drawImage(this.$refs.video, 0, 0);
-      this.captures.push(canvas.toDataURL("image/png"));
-      console.log("photo taken!");
-      this.$emit('photos', this.captures);
-    },
     startRecording(video) {
       navigator.getUserMedia({ video: true },
         stream => video.srcObject = stream,
@@ -80,6 +70,7 @@ export default {
       if (expression && this.$refs.quiz.isStarted()) {
         this.score += this.$refs.quiz.answer(expression);
         this.$refs.detect.stop();
+        this.capturePhoto();
         setTimeout(() => {
           this.$refs.quiz.nextQuestion()
             && this.$refs.detect.start();
@@ -89,7 +80,18 @@ export default {
     endGame() {
       this.$refs.detect.stop();
       this.$refs.quiz.stop();
-      this.$emit('end-game');
+      this.$emit('end-game', Object.freeze({
+        score: this.score,
+        photos: Object.freeze(this.photos)
+      }));
+    },
+    capturePhoto() {
+      const canvas = document.createElement("canvas");
+      canvas.width = this.$refs.video.videoWidth;
+      canvas.height = this.$refs.video.videoHeight;
+      canvas.getContext("2d").drawImage(this.$refs.video, 0, 0);
+      this.photos.push(canvas.toDataURL("image/png"));
+      console.log("photo taken!");
     }
   }
 };

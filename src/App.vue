@@ -7,10 +7,9 @@
         @end-tutorial="state = State.Onboard"
         @start-game="startGame"/>
     <Game v-if="state == State.Game"
-        @photos="setPhotos"
-        @end-game="state = State.End"/>
+        @end-game="endGame"/>
     <EndGame v-if="state == State.End"
-        :photos="this.photos"
+        :gameResult="gameResult"
         @onboarding="state = State.Onboard"
         @start-game="startGame"/>
   </v-app>
@@ -35,7 +34,7 @@ export default {
   data: () => ({
     State,
     state: State.Onboard,
-    photos: []
+    gameResult: Object.freeze({})
   }),
   methods: {
     setPhotos(photos) {
@@ -44,6 +43,10 @@ export default {
     startGame() {
       this.photos = [];
       this.state = State.Game;
+    },
+    endGame(gameResult) {
+      this.gameResult = gameResult || Object.freeze({});
+      this.state = State.End;
     }
   }
 };

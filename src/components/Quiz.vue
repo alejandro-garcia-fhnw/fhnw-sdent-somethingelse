@@ -132,8 +132,7 @@ export default {
         if (response === this.expressions[this.currentTrivia.correct_answer_index]) {
           points = 1;
         } else {
-          console.log("wrong answer")
-          // TODO this.$emit('capture-photo')
+          console.log("wrong answer");
         }
       }
       return points;
