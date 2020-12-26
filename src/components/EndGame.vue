@@ -2,18 +2,15 @@
   <div align="center">
     <h1>Game over</h1>
     <v-row>
-      <v-col lg12 v-for="(photo, index) in photos" :key="c">
-
+      <v-col lg12 v-for="(photo, index) in photos" :key="index">
           <div class="polaroid mt-15">
             <p>Snapshot {{ index + 1}}</p>
             <img :src="photo" height="250"/>
           </div>
-
       </v-col>
     </v-row>
-
     <div class="mt-10">
-      <v-btn x-large @click="playAgain">Play again</v-btn>
+      <v-btn x-large @click="$emit('start-game')">Play again</v-btn>
     </div>
   </div>
 </template>
@@ -25,9 +22,6 @@ export default {
     'photos' : Array
   },
   methods: {
-    playAgain () {
-      this.$emit('play-again');
-    }
   }
 }
 </script>

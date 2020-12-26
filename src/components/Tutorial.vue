@@ -160,20 +160,11 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-            <v-btn text class="red darken-2 mr-2" dark @click="cancel">
+            <v-btn text class="red darken-2 mr-2" dark @click="$emit('end-tutorial')">
               X
             </v-btn>
-            <v-progress-linear
-                color="primary"
-                rounded
-                value="50"
-            ></v-progress-linear>
-            <v-btn
-                class="ml-2"
-                color="primary"
-                @click="startGame"
-
-            >
+            <v-progress-linear color="primary" rounded value="50"/>
+            <v-btn class="ml-2" color="primary" @click="$emit('start-game')">
               Start
             </v-btn>
           </div>
@@ -191,12 +182,6 @@ export default {
     e1: 1,
   }),
   methods: {
-    cancel () {
-      this.$emit('cancel');
-    },
-    startGame () {
-      this.$emit('start-game');
-    }
   },
 }
 </script>

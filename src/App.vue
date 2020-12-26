@@ -1,38 +1,48 @@
 <template>
   <v-app id="app">
-    <div class="container">
-      <Onboarding v-if="onboarding" @start-game="onboarding = false"/>
-      <Game v-if="!onboarding && lostRounds < 6" @photos="getPhotos"/>
-      <EndGame v-if="!onboarding && lostRounds > 5" :photos="this.photos" @play-again="playAgain"/>
-    </div>
+    <Onboarding v-if="state == State.Onboard"
+        @start-tutorial="state = State.Tutorial"
+        @start-game="state = State.Game"/>
+    <Tutorial v-if="state == State.Tutorial"
+        @end-tutorial="state = State.Onboard"
+        @start-game="startGame"/>
+    <Game v-if="state == State.Game"
+        @photos="setPhotos"
+        @end-game="state = State.End"/>
+    <EndGame v-if="state == State.End"
+        :photos="this.photos"
+        @start-game="startGame"/>
   </v-app>
 </template>
 
 <script>
+import Tutorial from "@/components/Tutorial";
 import Game from "./components/Game.vue";
 import EndGame from "./components/EndGame.vue"
 import Onboarding from "@/components/Onboarding";
 
+const State = Object.freeze({
+  Onboard: 0,
+  Tutorial: 1,
+  Game: 2,
+  End: 3
+});
+
 export default {
   name: "App",
-  components: {
-    Onboarding,
-    EndGame,
-    Game
-  },
+  components: { Onboarding, Tutorial, Game, EndGame },
   data: () => ({
-    photos: [],
-    lostRounds : 0,
-    onboarding : true
+    State,
+    state: State.Onboard,
+    photos: []
   }),
   methods: {
-    getPhotos(photos) {
-      this.photos = photos
-      this.lostRounds = this.photos.length
+    setPhotos(photos) {
+      this.photos = photos;
     },
-    playAgain() {
-      this.photos = null
-      this.lostRounds = 0
+    startGame() {
+      this.photos = [];
+      this.state = State.Game;
     }
   }
 };
