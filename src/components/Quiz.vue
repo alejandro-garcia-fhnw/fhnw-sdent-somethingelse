@@ -30,7 +30,7 @@
     </v-card-text>
     <v-card-actions class="ml-2">
       <v-btn text color="red lighten-2"
-          :disabled="!!currentTrivia.given_answer"
+          :disabled="!enabledNext"
           @click="nextQuestion">
         Skip Question
       </v-btn>
@@ -59,7 +59,8 @@ export default {
     triviaLoader: null,
     currentTrivia: null,
     triviaCount: 0,
-    maxTrivia: 10
+    maxTrivia: 10,
+    enabledNext: false
   }),
   computed: {
     expressions() {
@@ -80,10 +81,7 @@ export default {
       return opentdb.resetToken(this.triviaOptions.token);
     },
     getTriviaLoader() {
-      return opentdb.getTrivia(this.triviaOptions).then(results => {
-        console.debug('question loaded', results[0]);
-        return results[0];
-      });
+      return opentdb.getTrivia(this.triviaOptions).then(results => results[0]);
     },
     isStarted() {
       return this.currentTrivia;
@@ -100,14 +98,13 @@ export default {
       }
     },
     nextQuestion() {
+      this.enabledNext = false;
       if (this.triviaCount < this.maxTrivia) {
-        this.triviaLoader.then(trivia => {
-          this.currentTrivia = this.buildTrivia(trivia);
-          this.triviaCount++;
-          console.log('nextQuestion:', trivia.correct_answer_index);
-        }).then(() => {
-          this.triviaLoader = this.getTriviaLoader(); // preload the next question
-        });
+        this.triviaLoader
+            .then(trivia => this.currentTrivia = this.buildTrivia(trivia))
+            .then(() => this.triviaCount++)
+            .then(() => this.triviaLoader = this.getTriviaLoader()) // preload the next trivia
+            .then(() => this.enabledNext = true); // enable next after trivia has loaded
         return true;
       } else {
         this.stop();
@@ -122,12 +119,14 @@ export default {
       trivia.correct_answer_index = trivia.all_answers
           .map((answer, index) => (answer === trivia.correct_answer) ? index : -1)
           .find(index => index >= 0);
+      console.log('nextQuestion:', trivia);
       return trivia;
     },
     answer(response) {
       let points = 0;
       if (this.currentTrivia && !this.currentTrivia.given_answer) {
         console.log('given answer:', response);
+        this.enabledNext = false;
         this.$set(this.currentTrivia, 'given_answer', response);
         if (response === this.expressions[this.currentTrivia.correct_answer_index]) {
           points = 1;

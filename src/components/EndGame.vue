@@ -7,7 +7,7 @@
     <v-row>
       <v-col lg12 v-for="(photo, index) in gameResult.photos" :key="index">
           <div class="polaroid mt-8">
-            <p>Snapshot {{ index + 1}}</p>
+            <p>Question {{ index + 1}}</p>
             <img :src="photo" :alt="index" height="250"/>
           </div>
       </v-col>
