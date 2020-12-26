@@ -58,9 +58,6 @@ export default {
         .catch(error => { console.warn('init failed', error); });
   },
   methods: {
-    reloadPage() {
-      window.location.reload()
-    },
     capturePhoto() {
       const canvas = document.createElement("canvas");
       canvas.width = this.$refs.video.videoWidth;
@@ -71,13 +68,12 @@ export default {
       this.$emit('photos', this.captures);
     },
     startRecording(video) {
-      navigator.getUserMedia = navigator.getUserMedia
-          || navigator.webkitGetUserMedia
-          || navigator.mozGetUserMedia;
-      navigator.getUserMedia(
-        { video: {} },
+      navigator.getUserMedia({ video: true },
         stream => video.srcObject = stream,
-        err => console.error(err)
+        err => {
+          this.endGame();
+          console.error(err);
+        }
       );
     },
     onDetect(expression) {
