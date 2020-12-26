@@ -51,23 +51,29 @@ export default {
       ]).then(() => this.input = input);
     },
     start() {
-      this.scores = Object.freeze({});
-      this.interval = setInterval(async () => {
-        const detection = await faceapi
-            .detectSingleFace(this.input, this.detect.options)
-            .withFaceExpressions();
-        if (detection && detection.expressions) {
-          this.scores = Object.freeze(detection.expressions);
-        } else {
-          console.log('unable to detect any expressions');
-          this.scores = Object.freeze({});
-        }
-      }, this.detect.interval);
-      console.debug('started');
+      if (!this.interval) {
+        this.scores = Object.freeze({});
+        this.interval = setInterval(this.detectAndUpdateScores, this.detect.interval);
+        console.debug('started');
+      }
+    },
+    async detectAndUpdateScores() {
+      const detection = await faceapi
+          .detectSingleFace(this.input, this.detect.options)
+          .withFaceExpressions();
+      if (detection && detection.expressions) {
+        this.scores = Object.freeze(detection.expressions);
+      } else {
+        console.log('unable to detect any expressions');
+        this.scores = Object.freeze({});
+      }
     },
     stop() {
-      clearInterval(this.interval);
-      console.debug('stopped');
+      if (this.interval) {
+        clearInterval(this.interval);
+        this.interval = null;
+        console.debug('stopped');
+      }
     }
   },
   watch: {

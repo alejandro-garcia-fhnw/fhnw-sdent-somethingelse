@@ -13,6 +13,7 @@
         @detected="onDetect"/>
     <Quiz ref="quiz"
         :emoteMap="emoteMap"
+        @end-quiz="endGame"
         @capture-photo="capturePhoto"/>
   </div>
 </template>
@@ -24,11 +25,7 @@ import Score from "./Score"
 
 export default {
   name: 'Game',
-  components: {
-    Score,
-    Detect,
-    Quiz
-  },
+  components: { Score, Detect, Quiz },
   data: () => ({
     emoteMap: Object.freeze(new Map([
       ['happy', '😃'],
@@ -83,6 +80,11 @@ export default {
             && this.$refs.detect.start();
         }, this.nextQuestionTimeout);
       }
+    },
+    endGame() {
+      this.$refs.detect.stop();
+      this.$refs.quiz.stop();
+      this.$emit('end-game');
     }
   }
 };

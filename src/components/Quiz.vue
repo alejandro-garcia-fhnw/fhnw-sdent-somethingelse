@@ -6,9 +6,7 @@
             v-if="currentTrivia">
           <v-card-title>
             <v-spacer></v-spacer>
-
             <span v-html="currentTrivia.question"/>
-
 <!--        Funktioniert immernonig :-) has jetzt uf mehreri Arte Probiert, es lauft nur bim erste mol.
 
             <vue-typed-js :stringsElement="'#test'" :showCursor="false" :contentType="'html'">
@@ -18,7 +16,6 @@
                <p>{{ currentTrivia.question }}</p>
              </div>
  -->
-
             <v-spacer></v-spacer>
           </v-card-title>
           <v-card-text>
@@ -98,12 +95,20 @@ export default {
       return this.currentTrivia;
     },
     start() {
-      this.nextQuestion();
+      if (!this.isStarted()) {
+        this.nextQuestion();
+      }
+    },
+    stop() {
+      if (this.isStarted()) {
+        this.currentTrivia = null;
+        this.$emit('end-quiz');
+      }
     },
     nextQuestion() {
       if (this.triviaCount < this.maxTrivia) {
         this.triviaLoader.then(trivia => {
-          this.currentTrivia = buildTrivia(trivia);
+          this.currentTrivia = this.buildTrivia(trivia);
           this.triviaCount++;
           console.log('nextQuestion:', trivia.correct_answer_index);
         }).then(() => {
@@ -111,8 +116,7 @@ export default {
         });
         return true;
       } else {
-        this.currentTrivia = null;
-        // TODO emit end?
+        this.stop();
       }
     },
     buildTrivia(trivia) {
@@ -124,6 +128,7 @@ export default {
       trivia.correct_answer_index = trivia.all_answers
           .map((answer, index) => (answer === trivia.correct_answer) ? index : -1)
           .find(index => index >= 0);
+      return trivia;
     },
     answer(response) {
       let points = 0;
