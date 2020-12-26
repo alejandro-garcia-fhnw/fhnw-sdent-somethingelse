@@ -160,7 +160,7 @@
           </v-card>
           <div style="display: flex;
               justify-content: space-between; ">
-            <v-btn text class="red darken-2 mr-2" dark @click="$emit('end-tutorial')">
+            <v-btn text class="red darken-2 mr-2" dark @click="cancel">
               X
             </v-btn>
             <v-progress-linear color="primary" rounded value="50"/>
@@ -182,6 +182,9 @@ export default {
     e1: 1,
   }),
   methods: {
+    cancel() {
+      this.$emit('end-tutorial');
+    }
   },
 }
 </script>

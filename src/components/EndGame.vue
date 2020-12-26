@@ -9,15 +9,20 @@
           </div>
       </v-col>
     </v-row>
-    <div class="mt-10">
-      <v-btn x-large @click="$emit('start-game')">Play again</v-btn>
+    <div class="mt-10 mb-10">
+      <v-btn class="mr-4" x-large @click="$emit('onboarding')">Back to Start</v-btn>
+      <v-btn class="mr-4" x-large @click="$emit('start-game')">Play again</v-btn>
     </div>
+    <Leaderboard />
   </div>
 </template>
 
 <script>
+import Leaderboard from "@/components/Leaderboard";
+
 export default {
   name: 'EndGame',
+  components: { Leaderboard },
   props: {
     'photos' : Array
   },

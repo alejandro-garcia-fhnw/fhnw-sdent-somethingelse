@@ -11,6 +11,7 @@
         @end-game="state = State.End"/>
     <EndGame v-if="state == State.End"
         :photos="this.photos"
+        @onboarding="state = State.Onboard"
         @start-game="startGame"/>
   </v-app>
 </template>
