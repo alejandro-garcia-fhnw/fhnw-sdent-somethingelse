@@ -1,53 +1,47 @@
 <template>
-  <div>
-    <v-row>
-      <v-col align="center">
-        <v-card width="800px" height="220"
-            v-if="currentTrivia">
-          <v-card-title>
-            <v-spacer></v-spacer>
-            <span v-html="currentTrivia.question"/>
+  <v-card class="quiz-card mb-2" width="800px" align="center"
+      v-if="currentTrivia">
+    <v-card-title>
+      <v-spacer></v-spacer>
+      <span v-html="currentTrivia.question"/>
 <!--        Funktioniert immernonig :-) has jetzt uf mehreri Arte Probiert, es lauft nur bim erste mol.
 
-            <vue-typed-js :stringsElement="'#test'" :showCursor="false" :contentType="'html'">
-               <p class="typing"></p>
-             </vue-typed-js>
-             <div id="test" style="display: none">
-               <p>{{ currentTrivia.question }}</p>
-             </div>
- -->
-            <v-spacer></v-spacer>
-          </v-card-title>
-          <v-card-text>
-            <v-row class="mt-0">
-              <v-col lg12>
-                <v-btn
-                    v-for="(answer, index) in currentTrivia.all_answers"
-                    :key="index"
-                    class="answer ml-1 mb-1"
-                    :class="revealAnswer(index)"
-                    width="380"
-                    style="font-size: 1.5rem"
-                    x-large>
-                  {{ emotes[index] }}
-                  <span v-html="answer"/>
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-actions style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 0;">
-          </v-card-actions>
-        </v-card>
-        <div>
-          <v-btn @click="nextQuestion">Skip</v-btn>
+      <vue-typed-js :stringsElement="'#test'" :showCursor="false" :contentType="'html'">
+          <p class="typing"></p>
+        </vue-typed-js>
+        <div id="test" style="display: none">
+          <p>{{ currentTrivia.question }}</p>
         </div>
-      </v-col>
-    </v-row>
-  </div>
+-->
+      <v-spacer></v-spacer>
+    </v-card-title>
+    <v-card-text>
+      <v-row>
+        <v-col lg12>
+          <v-btn class="answer ml-1 mb-1 text-h6" width="380" x-large
+              v-for="(answer, index) in currentTrivia.all_answers"
+              :key="index"                    
+              :class="revealAnswer(index)">
+            {{ emotes[index] }}
+            <span v-html="answer"/>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-card-text>
+    <v-card-actions class="ml-2">
+      <v-btn text color="red lighten-2"
+          :disabled="!!currentTrivia.given_answer"
+          @click="nextQuestion">
+        Skip Question
+      </v-btn>
+      <v-card-text align="right">
+        {{ maxTrivia - triviaCount + 1 }} remaining
+      </v-card-text>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
-
 import opentdb from 'opentdb-api';
 
 export default {
@@ -58,7 +52,7 @@ export default {
   data: () => ({
     triviaOptions: Object.freeze({
       amount: 1,
-      category: 'general', //'any'
+      category: 'general', // or 'any'
       difficulty: 'easy',
       type: 'multiple'
     }),
@@ -165,7 +159,9 @@ export default {
 </script>
 
 <style scoped>
-button {
-  font-size: 20px;
+.answer {
+  text-transform: none;
+  cursor: default;
+  /* TODO no hover effect */ 
 }
 </style>
