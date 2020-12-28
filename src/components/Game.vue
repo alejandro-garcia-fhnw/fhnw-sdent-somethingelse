@@ -3,7 +3,7 @@
     <h1 class="text-h3 font-weight-bold mb-8">
       something<span class="red--text">else</span>
     </h1>
-    <v-progress-circular class="spinner" indeterminate color="red" :size="70" :width="7"
+    <v-progress-circular indeterminate color="red" :size="70" :width="7"
         v-if="!loaded"/>
     <div class="container" v-show="loaded">
       <Score class="mb-16" :score="score"></Score>

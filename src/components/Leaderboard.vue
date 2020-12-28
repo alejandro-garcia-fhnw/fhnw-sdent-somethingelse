@@ -7,17 +7,20 @@
       <v-spacer></v-spacer>
       <v-icon color="red">mdi-star</v-icon>
     </v-toolbar>  
-    <v-list>  
+    <v-list>
       <v-list-item
           v-for="entry in loaderboard"
-          :key="entry.title">
+          :key="entry.name">
         <v-list-item-avatar>
-          <v-img
-            :alt="`${entry.title} photo`"
+          <v-img v-if="entry.photo"
+            :alt="entry.title"
             :src="entry.photo"/>
+          <v-icon v-if="!entry.photo">
+            mdi-account-circle
+          </v-icon>
         </v-list-item-avatar>
         <v-list-item-content>
-          <v-list-item-title v-text="entry.title"/>
+          <v-list-item-title v-text="entry.name"/>
         </v-list-item-content>
         <v-list-item-icon>
         </v-list-item-icon>
@@ -25,39 +28,41 @@
           <v-list-item-action-text v-text="entry.score"/>
         </v-list-item-action>
       </v-list-item>
+      <v-list-item v-if="!loaded">
+        <v-list-item-content>
+          <v-progress-circular indeterminate color="red" :size="30" :width="3"/>
+        </v-list-item-content>
+      </v-list-item>
     </v-list>
   </v-card>
 </template>
 
 <script>
+import axios from 'axios';
+const restdbUrl = 'https://somethingelse-5292.restdb.io';
+const restdbOptions = Object.freeze({
+  headers: Object.freeze({
+    'cache-control': 'no-cache',
+    'x-apikey': '5fe9ee88ff9d67063814096f'
+  })
+});
 
 export default {
   name: 'Loaderboard',
   data: () => ({
-    loaderboard: [
-      {
-        photo: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-        title: 'Jason Oner',
-        score: 12345
-      },
-      {
-        photo: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-        title: 'Mike Carlson',
-        score: 1234
-      },
-      {
-        photo: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-        title: 'Cindy Baker',
-        score: 123
-      },
-      {
-        photo: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-        title: 'Ali Connors',
-        score: 12
-      },
-    ]
+    loaderboard: [],
+    loaded: false
   }),
-  methods: {
+  mounted() {
+    axios.get(restdbUrl + '/rest/leaderboard', restdbOptions)
+      .then(response => {
+        this.loaderboard = (response.data || []).map(entry => {
+          const hasPhoto = entry && entry.photo && entry.photo.length && entry.photo[0];
+          entry.photo = hasPhoto ? restdbUrl + '/media/' + entry.photo[0] : null;
+          return entry;
+        }).sort((a, b) => b.score - a.score);
+        this.loaded = true;
+      }).catch(error => { console.warn('restdb', error); });
   }
 };
 </script>
