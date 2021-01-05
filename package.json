@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "express": "^4.17.1",
     "lottie-vuejs": "^0.4.0",
     "node-fetch": "^2.6.1",
     "opentdb-api": "^1.0.0",
