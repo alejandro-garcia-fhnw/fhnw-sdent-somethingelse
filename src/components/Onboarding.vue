@@ -2,7 +2,7 @@
   <v-app>
     <div id="app">
       <h1 class="text-h1 font-weight-bold mb-16">
-        something<span class="red--text">else 😉</span>
+        something<span class="red--text">else</span>
       </h1>
       <div v-if="hasVideoAccess">
         <v-btn class="mr-2" x-large @click="$emit('start-tutorial')">
