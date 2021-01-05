@@ -1,7 +1,7 @@
 <template>
   <div align="center">
     <h1 class="text-h3 font-weight-bold mt-8 mb-8">
-      game <span class="red--text">over</span>
+      game<span class="red--text">over</span>
     </h1>
     <Score :score="gameResult.score"></Score>
     <v-row>

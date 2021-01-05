@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-text>
-      <h1 class="mt-2 mb-2">
+      <h1 class="mt-5 mb-5">
         {{ score }}
       </h1>
     </v-card-text>
