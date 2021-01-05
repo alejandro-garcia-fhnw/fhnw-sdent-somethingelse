@@ -17,6 +17,9 @@
       <v-btn class="mr-4" x-large @click="$emit('start-game')">Play again</v-btn>
     </div>
     <Leaderboard />
+<v-footer>
+
+</v-footer>
   </div>
 </template>
 

@@ -2,7 +2,8 @@
   <v-app id="app">
     <Onboarding v-if="state == State.Onboard"
         @start-tutorial="state = State.Tutorial"
-        @start-game="state = State.Game"/>
+        @start-game="state = State.Game"
+        @start-multiplayer-game="state = State.Multiplayer"/>
     <Tutorial v-if="state == State.Tutorial"
         @end-tutorial="state = State.Onboard"
         @start-game="startGame"/>
@@ -12,6 +13,10 @@
         :gameResult="gameResult"
         @onboarding="state = State.Onboard"
         @start-game="startGame"/>
+    <Multiplayer
+        v-if="state == State.Multiplayer"
+        @stop-multiplayer-game="state = State.Onboard"
+    ></Multiplayer>
   </v-app>
 </template>
 
@@ -20,17 +25,19 @@ import Tutorial from "@/components/Tutorial";
 import Game from "./components/Game.vue";
 import EndGame from "./components/EndGame.vue"
 import Onboarding from "@/components/Onboarding";
+import Multiplayer from "@/components/Multiplayer";
 
 const State = Object.freeze({
   Onboard: 0,
   Tutorial: 1,
   Game: 2,
-  End: 3
+  End: 3,
+  Multiplayer: 4
 });
 
 export default {
   name: "App",
-  components: { Onboarding, Tutorial, Game, EndGame },
+  components: {Multiplayer, Onboarding, Tutorial, Game, EndGame },
   data: () => ({
     State,
     state: State.Onboard,
@@ -43,6 +50,10 @@ export default {
     startGame() {
       this.photos = [];
       this.state = State.Game;
+    },
+    startMultiplayerGame() {
+      this.state = State.Multiplayer;
+      console.log("asd")
     },
     endGame(gameResult) {
       this.gameResult = gameResult || Object.freeze({});

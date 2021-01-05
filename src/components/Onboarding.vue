@@ -5,12 +5,28 @@
         something<span class="red--text">else</span>
       </h1>
       <div v-if="hasVideoAccess">
-        <v-btn class="mr-2" x-large @click="$emit('start-tutorial')">
-          Tutorial
-        </v-btn>
-        <v-btn class="ml-2" x-large @click="$emit('start-game')">
-          Start Game
-        </v-btn>
+        <v-row>
+          <v-col>
+            <v-btn width="320" class="light-blue darken-3" x-large @click="$emit('start-tutorial')">
+              Tutorial
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-btn width="320" class="red lighten-1" x-large @click="$emit('start-game')">
+              Singleplayer Game
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-btn width="320" class="teal" x-large @click="$emit('start-multiplayer-game')">
+              Multiplayer Game
+            </v-btn>
+          </v-col>
+        </v-row>
+
       </div>
       <div class="container" v-if="!hasVideoAccess">
         <lottie-animation class="mb-4" :width="50" :height="50" path="animations/face.json"/>
@@ -25,7 +41,7 @@
           <p class="mt-5 typing"></p>
         </vue-typed-js>
       </div>
-      <Leaderboard class="mt-8"/>
+<!--      <Leaderboard class="mt-8"/>-->
     </div>
   </v-app>
 </template>
