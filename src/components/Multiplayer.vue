@@ -107,9 +107,10 @@
     </div>
 
     <div v-if="game.state === 'started'">
-      <h2>actual game</h2>
-      <h1>{{ game.questions }}</h1>
-      <v-btn @click="count">+</v-btn>
+<!--      <h2>actual game</h2>-->
+<!--      <h1>{{ game.questions }}</h1>-->
+<!--      <v-btn @click="count">+</v-btn>-->
+      <MultiplayerGame/>
     </div>
 
 
@@ -118,8 +119,11 @@
 </template>
 
 <script>
+
+import MultiplayerGame from "@/components/MultiplayerGame";
 export default {
 name: "Multiplayer",
+  components: {MultiplayerGame},
   data: () => ({
     username: null,
     gameId: null,
@@ -130,7 +134,7 @@ name: "Multiplayer",
       "id": null,
       "questions": [],
       "clients": [],
-      "state": null,
+      "state": null, //just to ease up prototyping
       "clientsReady": []
     },
     copiedToClipboard: false,
