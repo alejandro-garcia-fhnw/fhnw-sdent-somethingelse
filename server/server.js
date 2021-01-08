@@ -14,7 +14,13 @@ app.get(/.*/, (req, res) => {
 
 
 let clients = [];
-let game = {};
+let game = {
+    "id": null,
+    "questions": [10],
+    "clients": [],
+    "state": null,
+    "clientsReady": []
+};
 let games = [];
 
 
@@ -29,12 +35,12 @@ io.on('connection', (socket) => {
     console.log("Clients: " + clients.length);
 
     // create Game
-    socket.on('new_game', (username, gameId) => {
+    socket.on('create_game', (username, gameId) => {
         game = {
             "id": gameId,
             "questions": 10,
             "clients": [username],
-            "status": "waiting",
+            "state": "created",
             "clientsReady": []
         }
 
@@ -43,7 +49,7 @@ io.on('connection', (socket) => {
         socket.emit('update_game', game)
         console.log(username + " created a new Game: " + game.id);*/
         socket.join(gameId);
-        io.to(gameId).emit('update_game', game);
+        io.to(gameId).emit('update_gameState', game);
 
     })
 
@@ -51,7 +57,7 @@ io.on('connection', (socket) => {
     socket.on('cancel_game', (username, gameId) => {
         if (game.id === gameId) {
             game = {}
-            io.to(gameId).emit('update_game', game);
+            io.to(gameId).emit('update_gameState', game);
             console.log(username + " deleted the Game: " + gameId);
         }
         console.log("Game ID not found, nothing to delete....");
@@ -67,12 +73,9 @@ io.on('connection', (socket) => {
             if (foundGame.length > 0) {
                 game = foundGame[0];
                 game.clients.push(username)
-                console.log(game)
-                let msg = username + ' joined the game: ' + gameId;
-                socket.emit('alert_client',msg);
-                console.log(msg);
+                game.state = "full"
                 socket.join(gameId);
-                io.to(gameId).emit('update_game', game);
+                io.to(gameId).emit('update_gameState', game);
             }else {
                 socket.emit('alert_client','No Game Found');
                 console.log("no game with given gameId found")
@@ -84,7 +87,7 @@ io.on('connection', (socket) => {
         }
     })
     // remove me from game
-    socket.on('remove_game', (username, gameId) => {
+    socket.on('remove_game', (gameId, username) => {
         if (username && gameId) {
             let foundGame = games.filter((game) => {
                 return game.id === gameId
@@ -97,7 +100,7 @@ io.on('connection', (socket) => {
                 socket.emit('alert_client',msg);
                 console.log(msg);
                 socket.join(gameId);
-                io.to(gameId).emit('update_game', game);
+                io.to(gameId).emit('update_gameState', game);
             }
             else {
                 console.log("no game with given gameId found")
@@ -106,6 +109,48 @@ io.on('connection', (socket) => {
         else {
             console.log("no gameId oder no username given")
         }
+    })
+
+    // start game
+    socket.on('start_game', (gameId, username) => {
+
+            let foundGame = games.filter((game) => {
+                return game.id === gameId
+            })
+            console.log(foundGame)
+            if (games.length > 0) {
+                game = games[0];
+                if (game.clientsReady.length === 0) {
+                    game.clientsReady.push(username)
+                    game.state = "ready"
+                    socket.join(gameId);
+                    io.to(gameId).emit('update_gameState', game);
+                    console.log(game)
+                }
+                else if (game.clientsReady.length === 1) {
+                    game.clientsReady.push(username)
+                    socket.join(gameId);
+                    io.to(gameId).emit('update_gameState', game);
+                    console.log(game)
+                }
+                else if (game.clientsReady.length === 2) {
+                    game.state = "started"
+                    socket.join(gameId);
+                    io.to(gameId).emit('update_gameState', game);
+                    console.log(game)
+                }
+                else {
+                    console.log('error')
+                    game.clientsReady = []
+                    game.state = "full"
+                    socket.join(gameId);
+                    io.to(gameId).emit('update_gameState', game);
+                }
+            }
+            else {
+                console.log("no game with given gameId found")
+            }
+        //io.to(gameId).emit('update_gameState', game);
     })
 
 

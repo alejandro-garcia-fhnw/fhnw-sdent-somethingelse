@@ -1,11 +1,11 @@
 <template>
   <div id="game" ref="game">
     <h1 style="cursor: pointer" @click="$emit('stop-multiplayer-game')" class="text-h3 font-weight-bold mb-8">
-      something<span class="red--text">else</span> - Multiplayer
+      something<span class="red--text">else</span> - multiplayer
     </h1>
 
 <!--    Entry Point-->
-    <div v-if="this.step === 'start'">
+    <div v-if="this.game.state === null">
       <v-row>
         <v-col>
           <v-text-field color="teal" label="username" v-model="username"></v-text-field>
@@ -13,7 +13,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-btn width="320" v-if="username" class="teal lighten-2" x-large  @click="newGame">New Game</v-btn>
+          <v-btn width="320" v-if="username" class="teal lighten-2" x-large  @click="createGame">New Game</v-btn>
         </v-col>
       </v-row>
       <v-row>
@@ -24,7 +24,7 @@
     </div>
 
     <!--    New Game -->
-    <div v-if="this.step === 'new-game'">
+    <div v-if="this.game.state === 'created'">
       <v-alert v-if="showCopyAlert" dense outlined color="teal">
         <strong>Game ID</strong> copied to clipboard!
       </v-alert>
@@ -43,7 +43,7 @@
       </v-row>
       <v-row v-if="game.clients.length === 2">
         <v-col align="center">
-          <v-btn width="320" class="teal" x-large>Start Game</v-btn>
+          <v-btn width="320" class="teal" x-large @click="startGame">Start Game</v-btn>
         </v-col>
       </v-row>
       <v-row>
@@ -54,13 +54,12 @@
     </div>
 
     <!--    Join Game-->
-    <div v-if="this.step === 'join-game'">
+    <div v-if="this.game.state === 'joining'">
 
 
         <v-row>
           <v-col>
             <v-text-field color="teal" label="game id" v-model="gameId"></v-text-field>
-            <p class="orange--text">a{{ message }}</p>
           </v-col>
         </v-row>
         <v-row>
@@ -77,7 +76,7 @@
     </div>
 
     <!--    Search Game-->
-    <div v-if="this.step === 'search-game'">
+    <div v-if="this.game.state === 'full' || this.game.state === 'ready' ">
       <v-row>
         <v-col>
           <h2>Joined Game ID: <span class="teal--text">{{ game.id }}</span></h2>
@@ -91,7 +90,8 @@
       </v-row>
       <v-row v-if="game.clients.length === 2">
         <v-col align="center">
-          <v-btn width="320" class="teal" x-large>Start Game</v-btn>
+          <v-btn width="320" class="teal" x-large @click="startGame">Start Game</v-btn>
+          <p v-if="this.game.state === 'ready'">Dein Gegner ist bereit....</p>
         </v-col>
       </v-row>
       <v-row>
@@ -99,6 +99,10 @@
           <v-icon color="teal" style="cursor: pointer" @click="goBack">mdi-keyboard-backspace</v-icon>
         </v-col>
       </v-row>
+    </div>
+
+    <div v-if="game.state === 'started'">
+      <h2>actual game</h2>
     </div>
 
 
@@ -113,24 +117,31 @@ name: "Multiplayer",
     username: null,
     gameId: null,
     step: "start",
+
     showCopyAlert: false,
-    game: {},
+    game: {
+      "id": null,
+      "questions": [],
+      "clients": [],
+      "state": null,
+      "clientsReady": []
+    },
     copiedToClipboard: false,
     message: "test"
   }),
   methods: {
 
     // Create New Game and get a Game ID
-    newGame() {
+    createGame() {
       this.gameId = Math.random().toString(36).substring(2,8);
       this.step = "new-game"
-      this.$socket.client.emit('new_game',this.username, this.gameId)
+      this.$socket.client.emit('create_game',this.username, this.gameId)
     },
 
     // only next step nothing more
     joinGame () {
       //this.$socket.client.emit('join_game',this.gameId,this.username)
-      this.step = "join-game";
+      this.game.state = "joining"
     },
 
     // Search for Game and Join it if available
@@ -176,6 +187,14 @@ name: "Multiplayer",
       this.copiedToClipboard = true
     },
   },
+  watch: {
+    game: {
+      handler(val){
+        console.log('game state changed to: ' + val.state)
+      },
+      deep: true
+    }
+  },
   sockets: {
     /*
      * 👂 Listen to socket events emitted from the socket server
@@ -184,10 +203,15 @@ name: "Multiplayer",
       console.log("check" + socket)
     },
 
-    update_game(game) {
-      this.game = game
-      console.log("new game state received")
-      console.log(game)
+    update_gameState(game) {
+      //this.$set(this.game = game)
+      this.$set(this.game, 'state', game.state)
+      this.$set(this.game, 'id', game.id)
+      this.$set(this.game, 'clients', game.clients)
+      this.$set(this.game, 'clientsReady', game.clientsReady)
+      //this.game = game
+      //console.log("new game state received")
+      //console.log(game)
 
     },
     alert_client(msg) {
