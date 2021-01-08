@@ -55,8 +55,6 @@
 
     <!--    Join Game-->
     <div v-if="this.game.state === 'joining'">
-
-
         <v-row>
           <v-col>
             <v-text-field color="teal" label="game id" v-model="gameId"></v-text-field>
@@ -110,6 +108,8 @@
 
     <div v-if="game.state === 'started'">
       <h2>actual game</h2>
+      <h1>{{ game.questions }}</h1>
+      <v-btn @click="count">+</v-btn>
     </div>
 
 
@@ -176,13 +176,15 @@ name: "Multiplayer",
     },
 
     goBack() {
-      this.step = "start";
-      this.removeGame()
+      //this.removeGame()
       this.$socket.client.emit('cancel_game', this.gameId, this.username)
       this.gameId = null;
       this.username = null;
     },
-
+    count() {
+      //this.removeGame()
+      this.$socket.client.emit('counter',this.gameId, this.username)
+    },
 
 
 
@@ -216,6 +218,7 @@ name: "Multiplayer",
       this.$set(this.game, 'id', game.id)
       this.$set(this.game, 'clients', game.clients)
       this.$set(this.game, 'clientsReady', game.clientsReady)
+      this.$set(this.game, 'questions', game.questions)
       //this.game = game
       //console.log("new game state received")
       //console.log(game)

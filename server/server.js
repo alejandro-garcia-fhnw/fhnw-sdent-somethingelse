@@ -16,7 +16,7 @@ app.get(/.*/, (req, res) => {
 let clients = [];
 let game = {
     "id": null,
-    "questions": [10],
+    "questions": 10,
     "clients": [],
     "state": null,
     "clientsReady": []
@@ -45,9 +45,7 @@ io.on('connection', (socket) => {
         }
 
         games.push(game);
-        /*
-        socket.emit('update_game', game)
-        console.log(username + " created a new Game: " + game.id);*/
+        console.log(games)
         socket.join(gameId);
         io.to(gameId).emit('update_gameState', game);
 
@@ -90,6 +88,7 @@ io.on('connection', (socket) => {
                 game = foundGame[0];
                 game.clients.push(username)
                 game.state = "full"
+                // Todo: check games for actual game and update it
                 socket.join(gameId);
                 io.to(gameId).emit('update_gameState', game);
             }else {
@@ -134,8 +133,8 @@ io.on('connection', (socket) => {
                 return game.id === gameId
             })
             console.log(foundGame)
-            if (games.length > 0) {
-                game = games[0];
+            if (foundGame.length > 0) {
+                game = foundGame[0];
                 if (game.clientsReady.length === 0) {
                     game.clientsReady = [username]
                     game.state = "ready"
@@ -168,6 +167,23 @@ io.on('connection', (socket) => {
                 console.log("no game with given gameId found")
             }
         //io.to(gameId).emit('update_gameState', game);
+    })
+    // counter test
+    socket.on('counter', (gameId, username) => {
+        let foundGame = games.filter((game) => {
+            return game.id === gameId
+        })
+        if (foundGame.length > 0) {
+            game = foundGame[0];
+            console.log(username + ' pressed counter: ')
+            game.questions ++;
+            console.log(game.questions)
+            socket.join(gameId);
+            io.to(gameId).emit('update_gameState', game);
+        }else {
+            console.log("no game with given gameId found")
+        }
+
     })
 
 
