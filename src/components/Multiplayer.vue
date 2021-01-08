@@ -82,16 +82,23 @@
           <h2>Joined Game ID: <span class="teal--text">{{ game.id }}</span></h2>
         </v-col>
       </v-row>
-      <v-row>
+
+      <v-row v-if="game.state === 'full'">
         <v-col align="center" v-for="(client,index) in game.clients" :key="client">
           <strong>Player {{ index+1 }}: </strong> <br>
           <v-btn small outlined dark color="teal">{{ client }}</v-btn>
         </v-col>
       </v-row>
+      <v-row v-if="game.state === 'ready'">
+        <v-col align="center" v-for="(client,index) in game.clientsReady" :key="client">
+          <strong>Player {{ index+1 }}: </strong> <br>
+          <v-btn small dark color="teal">{{ client }}</v-btn>
+        </v-col>
+      </v-row>
+
       <v-row v-if="game.clients.length === 2">
         <v-col align="center">
           <v-btn width="320" class="teal" x-large @click="startGame">Start Game</v-btn>
-          <p v-if="this.game.state === 'ready'">Dein Gegner ist bereit....</p>
         </v-col>
       </v-row>
       <v-row>
@@ -135,7 +142,7 @@ name: "Multiplayer",
     createGame() {
       this.gameId = Math.random().toString(36).substring(2,8);
       this.step = "new-game"
-      this.$socket.client.emit('create_game',this.username, this.gameId)
+      this.$socket.client.emit('create_game', this.gameId, this.username)
     },
 
     // only next step nothing more
@@ -171,7 +178,7 @@ name: "Multiplayer",
     goBack() {
       this.step = "start";
       this.removeGame()
-      this.$socket.client.emit('cancel_game',this.username, this.gameId)
+      this.$socket.client.emit('cancel_game', this.gameId, this.username)
       this.gameId = null;
       this.username = null;
     },

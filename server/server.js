@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
     console.log("Clients: " + clients.length);
 
     // create Game
-    socket.on('create_game', (username, gameId) => {
+    socket.on('create_game', (gameId, username) => {
         game = {
             "id": gameId,
             "questions": 10,
@@ -54,13 +54,29 @@ io.on('connection', (socket) => {
     })
 
     // delete created game
-    socket.on('cancel_game', (username, gameId) => {
+    socket.on('cancel_game', (gameId, username) => {
         if (game.id === gameId) {
-            game = {}
+            game = {};
+            game.state = null;
+
+            // Remove game Object from games Array
+            let foundGames = games.filter((game) => {
+                return game.id === gameId
+            })
+            console.log(games)
+            if (foundGames.length === 1) {
+                let actualGame = foundGames[0]
+                let index = games.indexOf(actualGame);
+                games.splice(index, 1);
+                console.log(games)
+            }
+
+            socket.join(gameId);
             io.to(gameId).emit('update_gameState', game);
             console.log(username + " deleted the Game: " + gameId);
+        }else {
+            console.log("Game ID not found, nothing to delete....");
         }
-        console.log("Game ID not found, nothing to delete....");
     })
 
     // join existing game Max 2 Player
@@ -121,7 +137,7 @@ io.on('connection', (socket) => {
             if (games.length > 0) {
                 game = games[0];
                 if (game.clientsReady.length === 0) {
-                    game.clientsReady.push(username)
+                    game.clientsReady = [username]
                     game.state = "ready"
                     socket.join(gameId);
                     io.to(gameId).emit('update_gameState', game);
@@ -129,6 +145,7 @@ io.on('connection', (socket) => {
                 }
                 else if (game.clientsReady.length === 1) {
                     game.clientsReady.push(username)
+                    game.state = "started"
                     socket.join(gameId);
                     io.to(gameId).emit('update_gameState', game);
                     console.log(game)
