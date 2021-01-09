@@ -16,8 +16,7 @@
         <lottie-animation class="mb-4" :width="50" :height="50" path="animations/face.json"/>
         <p>
           Please allow
-          <span class="font-weight-bold">something
-            <span class="red--text">else</span>
+          <span class="font-weight-bold">something<span class="red--text">else</span>
           </span>
           to access your camera. Page reloads every 10 seconds ...
         </p>
